@@ -32,17 +32,51 @@
 
     <!-- Step 1: Encrypt Question Paper -->
     <div class="section">
-        <h3>Step 1: Upload Faculty ID & Question Paper (Encrypt)</h3>
-        <form method="POST" action="/encrypt" enctype="multipart/form-data">
-            <label>Faculty ID:</label>
-            <input type="text" name="faculty_id" required>
+    <h3>Step 1: Upload Faculty ID & Question Paper (Encrypt)</h3>
+    <form method="POST" action="/encrypt" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <label>Faculty ID:</label>
+        <input type="text" name="faculty_id" required>
 
-            <label>Original Question Paper (PDF or DOCX):</label>
-            <input type="file" name="question_paper" required>
+        <label>Select File Format:</label>
+        <select id="file_format" required onchange="setFileAccept()">
+            <option value="">-- Select Format --</option>
+            <option value=".pdf">PDF</option>
+            <option value=".docx">Word (DOCX)</option>
+            <option value=".xlsx">Excel (XLSX)</option>
+            <option value=".txt">Text (TXT)</option>
+        </select>
 
-            <button type="submit">Encrypt & Download ZIP</button>
-        </form>
-    </div>
+        <label>Upload Question Paper:</label>
+        <input type="file" id="question_paper" name="question_paper" disabled required>
+
+        <button type="submit">Encrypt & Download ZIP</button>
+    </form>
+</div>
+
+<script>
+function setFileAccept() {
+    let format = document.getElementById("file_format").value;
+    let fileInput = document.getElementById("question_paper");
+    fileInput.value = ""; // clear previous selection
+    if (format) {
+        fileInput.setAttribute("accept", format);
+        fileInput.removeAttribute("disabled"); // enable file input
+    } else {
+        fileInput.removeAttribute("accept");
+        fileInput.setAttribute("disabled", true); // disable until format selected
+    }
+}
+
+function validateForm() {
+    let format = document.getElementById("file_format").value;
+    if (!format) {
+        alert("Please select a file format before uploading.");
+        return false;
+    }
+    return true;
+}
+</script>
+
 
     <!-- Step 2: Embed ZIP into Image -->
     <div class="section">

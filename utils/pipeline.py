@@ -14,10 +14,18 @@ ZIP_FOLDER = 'payload_zip'
 for folder in [KEY_FOLDER, ENCRYPTED_FOLDER, HASH_FOLDER, ZIP_FOLDER]:
     os.makedirs(folder, exist_ok=True)
 
+# Allowed formats (can be extended)
+ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.doc', '.xlsx', '.xls', '.txt', '.csv', '.png', '.jpg', '.jpeg', '.mp4', '.mp3'}
+
 def encrypt_pipeline(input_path, cover_image_path, output_stego_path, faculty_id):
     print("Starting encryption pipeline...")
     print("Input path:", input_path)
     print("Cover image path:", cover_image_path)
+
+    # Check file extension
+    ext = os.path.splitext(input_path)[1].lower()
+    if ext not in ALLOWED_EXTENSIONS:
+        return False, f"File format {ext} not supported. Allowed: {ALLOWED_EXTENSIONS}", None
 
     # Generate key and save with faculty ID
     key = Fernet.generate_key()
@@ -27,7 +35,7 @@ def encrypt_pipeline(input_path, cover_image_path, output_stego_path, faculty_id
         key_file.write(key)
     print("Key saved at:", key_path)
 
-    # Encrypt the input file
+    # Encrypt the input file (works for all formats)
     encrypted_path = os.path.join(ENCRYPTED_FOLDER, os.path.basename(input_path) + ".enc")
     fernet = Fernet(key)
     try:
@@ -62,14 +70,4 @@ def encrypt_pipeline(input_path, cover_image_path, output_stego_path, faculty_id
         return False, f"Zipping failed: {e}", None
 
     # Skip embedding step for now
-    # try:
-    #     print("Embedding into image...")
-    #     result_path = embed_file_in_image(cover_image_path, payload_zip_path, output_stego_path)
-    #     print("Stego image saved at:", result_path)
-    #     return True, "Encryption and embedding successful.", result_path
-    # except Exception as e:
-    #     print("Embedding failed:", e)
-    #     return False, f"Embedding failed: {e}", None
-
-    # Temporary return without embedding
     return True, "Encryption successful. Embedding skipped.", payload_zip_path
